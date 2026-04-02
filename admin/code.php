@@ -10,6 +10,13 @@ $path = "../uploads";
 
 // dodavanje kategorije
 if (isset($_POST['add_category_btn'])) {
+    
+    if (!isset($_FILES['image']) || $_FILES['image']['error'] !== 0) {
+    $_SESSION['message'] = "Slika je obavezna!";
+    header("Location: add-category.php");
+    exit();
+    }
+
     $name = $_POST['name'];
     $description = $_POST['description'];
     $status = isset($_POST['status']) ? '1' : '0';
@@ -18,16 +25,20 @@ if (isset($_POST['add_category_btn'])) {
     $image_ext = pathinfo($image, PATHINFO_EXTENSION);
     $filename = time() . '.' . $image_ext;
 
-    $stmt = $conn->prepare("INSERT INTO categories (ime, status, opis, image) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("ssss", $name, $status, $description, $filename);
+    $stmt = $conn->prepare("INSERT INTO categories (ime, status, opis, image) VALUES (:ime, :status, :opis, :image)");
+    $stmt->bindParam(":ime", $name);
+    $stmt->bindParam(":status", $status);
+    $stmt->bindParam(":opis", $description);
+    $stmt->bindParam(":image", $filename);
 
     if ($stmt->execute()) {
+        $path = "../uploads";
         move_uploaded_file($_FILES['image']['tmp_name'], $path . '/' . $filename);
         redirect("add-category.php", "Kategorija je uspešno dodata");
     } else {
         redirect("add-category.php", "Nešto je krenulo po zlu");
     }
-    $stmt->close();
+    $stmt = null;
 } 
 
 // izmena kategorije
@@ -47,8 +58,12 @@ elseif (isset($_POST['update_category_btn'])) {
         $update_filename = $old_image;
     }
 
-    $stmt = $conn->prepare("UPDATE categories SET ime=?, opis=?, status=?, image=? WHERE id=?");
-    $stmt->bind_param("ssssi", $name, $description, $status, $update_filename, $category_id);
+    $stmt = $conn->prepare("UPDATE categories SET ime=:ime, opis=:opis, status=:status, image=:image WHERE id=:id");
+    $stmt->bindParam(":ime", $name);
+    $stmt->bindParam(":status", $status);
+    $stmt->bindParam(":opis", $description);
+    $stmt->bindParam(":image", $update_filename);
+    $stmt->bindParam(":id", $id);
 
     if ($stmt->execute()) {
         if ($new_image != "") {
@@ -61,23 +76,22 @@ elseif (isset($_POST['update_category_btn'])) {
     } else {
         redirect("edit-category.php?id=$category_id", "Greška pri osvežavanju");
     }
-    $stmt->close();
+    $stmt = null;
 }
 
 // brisanje kategorije
 elseif (isset($_POST['delete_category_btn'])) {
     $category_id = $_POST['category_id'];
 
-    $stmt_select = $conn->prepare("SELECT image FROM categories WHERE id=?");
-    $stmt_select->bind_param("i", $category_id);
+    $stmt_select = $conn->prepare("SELECT image FROM categories WHERE id=:id");
+    $stmt_select->bindParam(":id", $category_id);
     $stmt_select->execute();
-    $result = $stmt_select->get_result();
-    $category_data = $result->fetch_assoc();
+    $category_data = $stmt_select->fetch(PDO::FETCH_ASSOC);
     $image = $category_data['image'];
-    $stmt_select->close();
+    $stmt_select = null;
 
-    $stmt_delete = $conn->prepare("DELETE FROM categories WHERE id=?");
-    $stmt_delete->bind_param("i", $category_id);
+    $stmt_delete = $conn->prepare("DELETE FROM categories WHERE id=:id");
+    $stmt_delete->bindParam(":id", $category_id);
 
     if ($stmt_delete->execute()) {
         if (file_exists("../uploads/" . $image)) {
@@ -87,7 +101,7 @@ elseif (isset($_POST['delete_category_btn'])) {
     } else {
         redirect("category.php", "Nešto je krenulo po zlu");
     }
-    $stmt_delete->close();
+    $stmt_delete = null;
 }
 
 // proizvodi
@@ -109,9 +123,17 @@ elseif (isset($_POST['add_product_btn'])) {
     $filename = time() . '.' . $image_ext;
 
     if ($name != "" && $description != "") {
-        $stmt = $conn->prepare("INSERT INTO products (categoryId, ime, kratkiOpis, opis, orginalnaCena, prodajnaCena, kolicina, status, trending, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        // i = integer, s = string, d = double
-        $stmt->bind_param("issssdisss", $category_id, $name, $small_description, $description, $original_price, $selling_price, $qty, $status, $trending, $filename);
+        $stmt = $conn->prepare("INSERT INTO products (categoryId, ime, kratkiOpis, opis, orginalnaCena, prodajnaCena, kolicina, status, trending, image) VALUES (:categoryId, :ime, :kratkiOpis, :opis, :orginalnaCena, :prodajnaCena, :kolicina, :status, :trending, :image)");
+        $stmt->bindParam(":categoryId", $category_id);
+        $stmt->bindParam(":ime", $name);
+        $stmt->bindParam(":kratkiOpis", $small_description);
+        $stmt->bindParam(":opis", $description);
+        $stmt->bindParam(":orginalnaCena", $original_price);
+        $stmt->bindParam(":prodajnaCena", $selling_price);
+        $stmt->bindParam(":kolicina", $qty);
+        $stmt->bindParam(":status", $status);
+        $stmt->bindParam(":trending", $trending);
+        $stmt->bindParam(":image", $filename);
 
         if ($stmt->execute()) {
             move_uploaded_file($_FILES['image']['tmp_name'], $path . '/' . $filename);
@@ -119,7 +141,7 @@ elseif (isset($_POST['add_product_btn'])) {
         } else {
             redirect("add-product.php", "Greška u bazi podataka");
         }
-        $stmt->close();
+        $stmt = null;
     } else {
         redirect("add-product.php", "Sva polja su obavezna");
     }
@@ -128,7 +150,10 @@ elseif (isset($_POST['add_product_btn'])) {
 // izmena proizvoda
 elseif (isset($_POST['update_product_btn'])) {
     $product_id = $_POST['product_id'];
-    $category_id = $_POST['category_id'];
+    $stmtCat = $conn->prepare("SELECT categoryId FROM products WHERE id=:id");
+    $stmtCat->execute([':id' => $product_id]);
+    $currentCategory = $stmtCat->fetch(PDO::FETCH_ASSOC)['categoryId'];
+
     $name = $_POST['name'];
     $small_description = $_POST['small_description'];
     $description = $_POST['description'];
@@ -138,21 +163,33 @@ elseif (isset($_POST['update_product_btn'])) {
     $status = isset($_POST['status']) ? '1' : '0';
     $trending = isset($_POST['trending']) ? '1' : '0';
 
+
     $new_image = $_FILES['image']['name'];
     $old_image = $_POST['old_image'];
 
-    if ($new_image != "") {
+    if (isset($_FILES['image']) && $_FILES['image']['error'] === 0) {
         $image_ext = pathinfo($new_image, PATHINFO_EXTENSION);
         $update_filename = time() . '.' . $image_ext;
     } else {
         $update_filename = $old_image;
     }
 
-    $stmt = $conn->prepare("UPDATE products SET categoryId=?, ime=?, kratkiOpis=?, opis=?, orginalnaCena=?, prodajnaCena=?, kolicina=?, status=?, trending=?, image=? WHERE id=?");
-    $stmt->bind_param("issssdisssi", $category_id, $name, $small_description, $description, $original_price, $selling_price, $qty, $status, $trending, $update_filename, $product_id);
+    $stmt = $conn->prepare("UPDATE products SET categoryId=:categoryId, ime=:ime, kratkiOpis=:kratkiOpis, opis=:opis, orginalnaCena=:orginalnaCena, prodajnaCena=:prodajnaCena, kolicina=:kolicina, status=:status, trending=:trending, image=:image WHERE id=:id");
+    $stmt->bindParam(":categoryId", $currentCategory);
+    $stmt->bindParam(":ime", $name);
+    $stmt->bindParam(":kratkiOpis", $small_description);
+    $stmt->bindParam(":opis", $description);
+    $stmt->bindParam(":orginalnaCena", $original_price);
+    $stmt->bindParam(":prodajnaCena", $selling_price);
+    $stmt->bindParam(":kolicina", $qty);
+    $stmt->bindParam(":status", $status);
+    $stmt->bindParam(":trending", $trending);
+    $stmt->bindParam(":image", $update_filename);
+    $stmt->bindParam(":id", $product_id);
 
     if ($stmt->execute()) {
         if ($new_image != "") {
+            $path = "../uploads";
             move_uploaded_file($_FILES['image']['tmp_name'], $path . '/' . $update_filename);
             if (file_exists("../uploads/" . $old_image)) {
                 unlink("../uploads/" . $old_image);
@@ -162,24 +199,23 @@ elseif (isset($_POST['update_product_btn'])) {
     } else {
         redirect("edit-product.php?id=$product_id", "Greška pri izmeni");
     }
-    $stmt->close();
+    $stmt = null;
 }
 
 // brisanje proizvoda
 elseif (isset($_POST['delete_product_btn'])) {
     $product_id = $_POST['product_id'];
 
-    $stmt_select = $conn->prepare("SELECT image FROM products WHERE id=?");
-    $stmt_select->bind_param("i", $product_id);
+    $stmt_select = $conn->prepare("SELECT image FROM products WHERE id=:id");
+    $stmt_select->bindParam(":id", $product_id);
     $stmt_select->execute();
-    $result = $stmt_select->get_result();
+    $product_data = $stmt_select->fetch(PDO::FETCH_ASSOC);
     
-    if($result->num_rows > 0) {
-        $product_data = $result->fetch_assoc();
+    if($product_data) {
         $image = $product_data['image'];
 
-        $stmt_delete = $conn->prepare("DELETE FROM products WHERE id=?");
-        $stmt_delete->bind_param("i", $product_id);
+        $stmt_delete = $conn->prepare("DELETE FROM products WHERE id=:id");
+        $stmt_delete->bindParam(":id", $product_id);
 
         if ($stmt_delete->execute()) {
             if ($image != "" && file_exists("../uploads/" . $image)) {
@@ -189,9 +225,9 @@ elseif (isset($_POST['delete_product_btn'])) {
         } else {
             redirect("products.php", "Greška pri brisanju");
         }
-        $stmt_delete->close();
+        $stmt_delete = null;
     }
-    $stmt_select->close();
+    $stmt_select = null;
 }
 // porudzbine
 
@@ -200,15 +236,16 @@ elseif (isset($_POST['update_order_btn'])) {
     $track_no = $_POST['trackingNo'];
     $order_status = $_POST['status'];
 
-    $stmt = $conn->prepare("UPDATE orders SET status = ? WHERE trackingNo = ?");
+    $stmt = $conn->prepare("UPDATE orders SET status = :status WHERE trackingNo = :trackingNo");
     
-    $stmt->bind_param("ss", $order_status, $track_no);
+    $stmt->bindParam(":status", $order_status);
+    $stmt->bindParam(":trackingNo", $track_no);
 
     if ($stmt->execute()) {
-        $stmt->close();
+        $stmt = null;
         redirect("view-order.php?t=$track_no", "Status porudžbine je uspešno ažuriran");
     } else {
-        $stmt->close();
+        $stmt = null;
         redirect("view-order.php?t=$track_no", "Došlo je do greške u bazi");
     }
 }

@@ -1,25 +1,43 @@
-<!-- <?php
-    // $host = "localhost";
-    // $user = "root";
-    // $pass = "";
-    // $database = "bike_shop"; 
-
-    // $conn = new mysqli($host, $user, $pass, $database);
-    // if($conn->connect_errno) {
-    //     echo ("Neuspesna konekcija: $conn->connect_errno, poruka: $conn->connect_error");
-    //     exit();
-    // }
-?> -->
 <?php
-$host = getenv('mysql.railway.internal');
-$user = getenv('root');
-$pass = getenv('grCgOyiEgdtKMFCJLykCJOcWKLtghWfb');
-$db   = getenv('railway');
-$port = getenv('3306');
+    if (!defined('SERVER')) {
+    define('SERVER', 'localhost');
+    }
 
-$conn = new mysqli($host, $user, $pass, $db, $port);
+    if (!defined('USERNAME')) {
+        define('USERNAME', 'root');
+    }
 
-if ($conn->connect_error) {
-    die("Greška pri povezivanju: " . $conn->connect_error);
-}
+    if (!defined('PASSWORD')) {
+        define('PASSWORD', '');
+    }
+
+    if (!defined('DATABASE')) {
+        define('DATABASE', 'bike_shop');
+    }
+    try {
+        $conn = new PDO("mysql:host=".SERVER.";dbname=".DATABASE.";charset=utf8", USERNAME, PASSWORD);
+
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    }
+    catch(PDOException $ex){
+        die("PDO GREŠKA: " . $ex->getMessage());
+    }
 ?>
+<!-- // $host = getenv('MYSQLHOST');
+// $db   = getenv('MYSQLDATABASE');
+// $user = getenv('MYSQLUSER');
+// $pass = getenv('MYSQLPASSWORD');
+// $port = getenv('MYSQLPORT');
+
+// try {
+//     $conn = new PDO(
+//         "mysql:host=$host;port=$port;dbname=$db;charset=utf8mb4",
+//         $user,
+//         $pass
+//     );
+
+//     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+// } catch (PDOException $e) {
+//     die("Greška pri povezivanju: " . $e->getMessage());
+// } -->

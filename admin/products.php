@@ -1,5 +1,6 @@
 <?php
 include_once "../middleware/adminMiddleWare.php";
+include_once "../functions/userfunctions.php";
 include_once "includes/header.php";
 ?>
 <div class="container">
@@ -23,7 +24,7 @@ include_once "includes/header.php";
                             </thead>
                             <tbody>
                                 <?php $products = getAll("products");
-                                if (mysqli_num_rows($products) > 0) {
+                                if (!empty($products)) {
                                     foreach ($products as $item) { ?>
                                         <tr>
                                             <td><?= $item['id']; ?></td>
@@ -31,7 +32,7 @@ include_once "includes/header.php";
                                             <td>
                                                 <img src="../uploads/<?= $item['image']; ?>" width="50px" height="50px" alt="<?= $item['ime']; ?>">
                                             </td>
-                                            <td><?= $item['status'] == '0' ? "Visible" : "Hidden" ?></td>
+                                            <td><?= ($item['status'] == 0) ? "Visible" : "Hidden" ?></td>
                                             <td>
                                                 <a href="edit-product.php?id=<?= $item['id']; ?>" class="btn btn-primary">Izmeni</a>
                                                 <form action="code.php" method="POST">

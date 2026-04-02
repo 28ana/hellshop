@@ -42,22 +42,27 @@ if (isset($_POST['register_btn']))
         redirect("../register.php", "Lozinke se ne podudaraju.");
     }
 
+    $stmt = $conn->prepare("SELECT email FROM users WHERE email = :email");
+    $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+    $stmt->execute();
 
-    $stmt = mysqli_prepare($conn, "SELECT email FROM users WHERE email=?");
-    mysqli_stmt_bind_param($stmt, "s", $email);
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
-
-    if (mysqli_num_rows($result) > 0) {
+    if ($stmt->rowCount() > 0) {
         redirect("../register.php", "Email je već registrovan.");
     } 
     else {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-        $insert_query = "INSERT INTO users (ime, phone, email, password) VALUES (?, ?, ?, ?)";
-        $stmt_insert = mysqli_prepare($conn, $insert_query);
-        mysqli_stmt_bind_param($stmt_insert, "ssss", $name, $phone, $email, $hashed_password);
-        
-        if (mysqli_stmt_execute($stmt_insert)) {
+
+        $stmt_insert = $conn->prepare("
+            INSERT INTO users (ime, phone, email, password) 
+            VALUES (:name, :phone, :email, :password)
+        ");
+
+        $stmt_insert->bindParam(':name', $name, PDO::PARAM_STR);
+        $stmt_insert->bindParam(':phone', $phone, PDO::PARAM_STR);
+        $stmt_insert->bindParam(':email', $email, PDO::PARAM_STR);
+        $stmt_insert->bindParam(':password', $hashed_password, PDO::PARAM_STR);
+
+        if ($stmt_insert->execute()) {
             redirect("../login.php", "Registracija uspešno završena. Prijavite se.");
         } else {
             redirect("../register.php", "Greška pri upisu u bazu podataka.");
@@ -77,16 +82,15 @@ else if (isset($_POST['login_btn']))
         redirect("../login.php", "Unesite ispravnu email adresu.");
     }
 
-    $login_query = "SELECT * FROM users WHERE email=?";
-    $stmt_login = mysqli_prepare($conn, $login_query);
-    mysqli_stmt_bind_param($stmt_login, "s", $email);
-    mysqli_stmt_execute($stmt_login);
-    $result = mysqli_stmt_get_result($stmt_login);
+    $stmt_login = $conn->prepare("SELECT * FROM users WHERE email = :email");
+    $stmt_login->bindParam(':email', $email, PDO::PARAM_STR);
+    $stmt_login->execute();
 
-    if (mysqli_num_rows($result) > 0) {
-        $userdata = mysqli_fetch_array($result);
-        
+    $userdata = $stmt_login->fetch(PDO::FETCH_ASSOC);
+
+    if ($userdata) {
         if (password_verify($password, $userdata['password'])) {
+
             $_SESSION['auth'] = true;
             $_SESSION['role_as'] = $userdata['role_as'];
             $_SESSION['auth_user'] = [
@@ -100,6 +104,7 @@ else if (isset($_POST['login_btn']))
             } else {
                 redirect("../index.php", "Uspešno ste se ulogovali. Dobrodošli!");
             }
+
         } else {
             redirect("../login.php", "Pogrešna lozinka. Pokušajte ponovo.");
         }

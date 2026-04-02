@@ -1,5 +1,6 @@
 <?php
 include_once "../middleware/adminMiddleWare.php";
+include_once "../functions/userfunctions.php";
 include "includes/header.php";
 ?>
 
@@ -26,8 +27,9 @@ include "includes/header.php";
                             <tbody>
                                 <?php
                                 $orders = getAllOrders();
-                                if (mysqli_num_rows($orders) > 0) {
-                                    foreach ($orders as $item) {
+                                $orderList = $orders->fetchAll(PDO::FETCH_ASSOC);
+                                if (!empty($orderList)) {
+                                    foreach ($orderList as $item) {
                                 ?>
                                         <tr>
                                             <td><?= $item['id']; ?></td>

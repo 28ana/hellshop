@@ -6,14 +6,14 @@ if (isset($_SESSION['auth']) && $_SESSION['auth'] == true)
 {
     if (isset($_POST['placeOrderBtn'])) 
     {
-        $name = mysqli_real_escape_string($conn, $_POST['name']);
-        $email = mysqli_real_escape_string($conn, $_POST['email']);
-        $phone = mysqli_real_escape_string($conn, $_POST['phone']);
-        $pincode = mysqli_real_escape_string($conn, $_POST['pincode']);
-        $address = mysqli_real_escape_string($conn, $_POST['address']);
-        $payment_mode = mysqli_real_escape_string($conn, $_POST['payment_mode']);
-        $payment_id = mysqli_real_escape_string($conn, $_POST['payment_id'] ?? "");
-
+        $name = $_POST['name'];
+        $email = $_POST['email'];
+        $phone = $_POST['phone'];
+        $pincode = $_POST['pincode'];
+        $address = $_POST['address'];
+        $payment_mode = $_POST['payment_mode'];
+        $payment_id = $_POST['payment_id'] ?? "";
+        
         if (empty($name) || empty($email) || empty($phone) || empty($pincode) || empty($address)) {
             $_SESSION['message'] = "Sva polja su obavezna!";
             header('Location: ../checkout.php');
@@ -31,13 +31,15 @@ if (isset($_SESSION['auth']) && $_SESSION['auth'] == true)
         // DOHVATANJE STAVKI IZ KORPE I PROVERA LAGERA
         $cart_query = "SELECT c.prodQty, c.prodId, p.ime, p.prodajnaCena, p.kolicina as lager 
                        FROM carts c, products p 
-                       WHERE c.prodId=p.id AND c.userId='$userId'";
-        $cart_query_run = mysqli_query($conn, $cart_query);
+                       WHERE c.prodId=p.id AND c.userId=:userId";
+        $cart = $conn->prepare($cart_query);
+        $cart->bindParam(':userId', $userId, PDO::PARAM_INT);
+        $cart->execute();
 
         $totalPrice = 0;
         $cartItems = [];
 
-        while($row = mysqli_fetch_assoc($cart_query_run)) 
+        while($row = $cart->fetch(PDO::FETCH_ASSOC))
         {
             // Provera da li ima dovoljno na stanju
             if($row['prodQty'] > $row['lager']) {
@@ -60,13 +62,24 @@ if (isset($_SESSION['auth']) && $_SESSION['auth'] == true)
         $tracking_no = "anacode" . rand(1111, 9999) . substr($phone, -4);
 
         $insert_query = "INSERT INTO orders (userId, trackingNo, imePrezime, email, telefon, adresa, pincode, totalPrice, payMode, payId) 
-                         VALUES ('$userId', '$tracking_no', '$name', '$email', '$phone', '$address', '$pincode', '$totalPrice', '$payment_mode', '$payment_id')";
+                         VALUES (:userId, :tracking_no, :name, :email, :phone, :address, :pincode, :totalPrice, :payment_mode, :payment_id)";
         
-        $insert_query_run = mysqli_query($conn, $insert_query);
+        $stmt = $conn->prepare($insert_query);
 
-        if ($insert_query_run) 
+        if ($stmt->execute([
+            ':userId' => $userId,
+            ':tracking_no' => $tracking_no,
+            ':name' => $name,
+            ':email' => $email,
+            ':phone' => $phone,
+            ':address' => $address,
+            ':pincode' => $pincode,
+            ':totalPrice' => $totalPrice,
+            ':payment_mode' => $payment_mode,
+            ':payment_id' => $payment_id
+        ])) 
         {
-            $orderId = mysqli_insert_id($conn);
+            $orderId = $conn->lastInsertId();
 
             foreach ($cartItems as $citem) 
             {
@@ -76,17 +89,28 @@ if (isset($_SESSION['auth']) && $_SESSION['auth'] == true)
 
                 // Upis stavki u order_items
                 $insert_items_query = "INSERT INTO order_items (orderId, prodId, oiKolicina, cena) 
-                                       VALUES ('$orderId', '$prodId', '$qty', '$price')";
-                mysqli_query($conn, $insert_items_query);
+                                       VALUES (:orderId, :prodId, :qty, :price)";
+                $stmtItem = $conn->prepare($insert_items_query);
+                $stmtItem->execute([
+                    ':orderId' => $orderId,
+                    ':prodId' => $prodId,
+                    ':qty' => $qty,
+                    ':price' => $price
+                ]);
 
                 // Azuriranje lagera (smanjujemo kolicinu u products)
-                $updateQty_query = "UPDATE products SET kolicina = kolicina - '$qty' WHERE id='$prodId'";
-                mysqli_query($conn, $updateQty_query);
+                $updateQty_query = "UPDATE products SET kolicina = kolicina - :qty WHERE id=:prodId";
+                $stmtUpdate=$conn->prepare($updateQty_query);
+                $stmtUpdate->execute([
+                ':qty' => $qty,
+                ':prodId' => $prodId
+                ]);
             }
 
             // BRISANJE KORPE NAKON USPESNE KUPOVINE
-            $deleteCartQuery = "DELETE FROM carts WHERE userId='$userId'";
-            mysqli_query($conn, $deleteCartQuery);
+            $deleteCartQuery = "DELETE FROM carts WHERE userId=:userId";
+            $delete_cart = $conn->prepare($deleteCartQuery);
+            $delete_cart->execute([':userId' => $userId]);
 
             $_SESSION['message'] = "Narudžbina je uspešno kreirana!";
             header('Location: ../my-orders.php');
@@ -94,7 +118,8 @@ if (isset($_SESSION['auth']) && $_SESSION['auth'] == true)
         }
         else 
         {
-            $_SESSION['message'] = "Greška pri upisu narudžbine: " . mysqli_error($conn);
+            $error = $stmt->errorInfo();
+            $_SESSION['message'] = "Greška pri upisu narudžbine: " . $error[2];
             header('Location: ../checkout.php');
             exit();
         }

@@ -10,16 +10,11 @@
 
     <div class="collapse navbar-collapse" id="navbarNavDropdown">
       <ul class="navbar-nav ms-auto">
-<?php
-$query = "SELECT * FROM nav_items ORDER BY position ASC";
-$result = mysqli_query($conn, $query);
-
-?>
         <?php
         $query = "SELECT * FROM nav_items  ORDER BY position ASC";
-        $result = mysqli_query($conn, $query);
+        $stmt = $conn->query($query);
 
-        while($row = mysqli_fetch_assoc($result)) {
+        while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 
             $show = false;
 

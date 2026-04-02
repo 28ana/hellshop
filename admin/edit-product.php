@@ -1,5 +1,6 @@
 <?php
 include_once "../middleware/adminMiddleWare.php";
+include_once "../functions/userfunctions.php";
 include_once "includes/header.php";
 ?>
 <div class="container">
@@ -11,9 +12,8 @@ include_once "includes/header.php";
                 $id = $_GET['id'];
                 $product = getById('products', $id);
 
-                if (mysqli_num_rows($product) > 0) {
-                    $data = mysqli_fetch_array($product);
-
+                if (!empty($product)) {
+                    $data = $product;
             ?>
                     <div class="card">
                         <div class="card-header bg-primary">
@@ -24,26 +24,7 @@ include_once "includes/header.php";
                         <div class="card-body">
                             <form action="code.php" method="POST" enctype="multipart/form-data">
                                 <div class="row">
-                                    <div class="col-md-12  mb-2">
-                                        <label for="">Izaberi kategoriju</label>
-
-                                        <select name="category_id" class="form-select">
-                                            <option selected>Izaberi kategoriju</option>
-                                            <?php
-                                            $category = getAll("categories");
-
-                                            if (mysqli_num_rows($category) > 0) {
-                                                foreach ($category as $item) {
-                                            ?>
-                                                    <option value="<?= $item['id']; ?>" <?= $data['category'] = $item['id'] ? "selected" : ""; ?>><?= $item['ime'] ?></option>
-                                            <?php
-                                                }
-                                            } else {
-                                                echo "Nema dostupne kategorije.";
-                                            }
-                                            ?>
-                                        </select>
-                                    </div>
+                                    
                                     <input type="hidden" name="product_id" value="<?= $data['id']; ?>">
                                     <div class="col-md-6">
                                         <label class="mb-0" for="">Ime</label>
@@ -67,7 +48,7 @@ include_once "includes/header.php";
                                     </div>
                                     <div class="col-md-12">
                                         <label class="mb-0" for="">Dodaj sliku</label>
-                                        <input type="hidden" name="old_image" value=" <?= $data['image']; ?>">
+                                        <input type="hidden" name="old_image" value="<?= $data['image']; ?>">
                                         <input type="file" name="image" class="form-control mb-2">
                                         <label class="mb-0" for="">Trenutna slika</label>
                                         <img src="../uploads/<?= $data['image']; ?>" alt="Slika proizvoda" width="50px" height="50px">

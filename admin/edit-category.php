@@ -1,5 +1,6 @@
 <?php
 include_once "../middleware/adminMiddleWare.php";
+include_once "../functions/userfunctions.php";
 include_once "includes/header.php";
 
 ?>
@@ -9,9 +10,8 @@ include_once "includes/header.php";
             <?php
             if (isset($_GET['id'])) {
                 $id = $_GET['id'];
-                $category = getById('categories', $id);
-                if (mysqli_num_rows($category) > 0) {
-                    $data = mysqli_fetch_array($category);
+                $data = getById('categories', $id);
+                if ($data) {
             ?>
                     <div class="card">
                         <div class="card-header bg-primary">

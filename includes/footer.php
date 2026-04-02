@@ -5,21 +5,13 @@
                 <h4 class="text-white">E-shop</h4>
                 <div class="underline mb-2"></div><br>
                 
-                <?php
-$query = "SELECT * FROM nav_items ORDER BY position ASC";
-$result = mysqli_query($conn, $query);
+<?php
+    $query = "SELECT * FROM nav_items ORDER BY position ASC";
+    $stmt = $conn->query($query)
 
-if(!$result){
-    die("Query error: " . mysqli_error($conn));
-}
-
-echo "Broj redova: " . mysqli_num_rows($result);
 ?>
         <?php
-        $query = "SELECT * FROM nav_items  ORDER BY position ASC";
-        $result = mysqli_query($conn, $query);
-
-        while($row = mysqli_fetch_assoc($result)) {
+        while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 
             $show = false;
 

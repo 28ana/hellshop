@@ -21,7 +21,7 @@ include_once "includes/header.php";
                                     <?php
                                     $category = getAll("categories");
 
-                                    if (mysqli_num_rows($category) > 0) {
+                                    if ($category) {
                                         foreach ($category as $item) {
                                     ?>
                                             <option value="<?= $item['id']; ?>"><?= $item['ime'] ?></option>

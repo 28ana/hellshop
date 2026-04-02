@@ -1,5 +1,6 @@
 <?php
 include_once "../middleware/adminMiddleWare.php";
+include_once "../functions/userfunctions.php";
 include_once "includes/header.php";
 ?>
 <div class="container">
@@ -23,8 +24,9 @@ include_once "includes/header.php";
                             </thead>
                             <tbody>
                                 <?php $category = getAll("categories");
-                                if (mysqli_num_rows($category) > 0) {
-                                    foreach ($category as $item) { ?>
+                                $categoryList = $category->fetchAll(PDO::FETCH_ASSOC);
+                                if (!empty($categoryList)) {
+                                    foreach ($categoryList as $item) { ?>
                                         <tr>
                                             <td><?= $item['id']; ?></td>
                                             <td><?= $item['ime']; ?></td>

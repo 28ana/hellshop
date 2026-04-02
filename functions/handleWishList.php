@@ -1,62 +1,70 @@
 <?php
 session_start();
 include "../config/dbcon.php";
-include_once "userfunctions.php";
 
 if (isset($_SESSION['auth']) == true) {
+
     if (isset($_POST['scope2'])) {
+
         $scope2 = $_POST['scope2'];
+        $userId = $_SESSION['auth_user']['user_id'];
+
         switch ($scope2) {
+
             case "add":
                 $prodId = $_POST['prodId'];
-                $userId = $_SESSION['auth_user']['user_id'];
 
-                $chk_existing_wishlist = "SELECT * FROM wishlist WHERE prodId='$prodId' AND userId='$userId'";
-                $chk_existing_wishlist_run = mysqli_query($conn, $chk_existing_wishlist);
+                $stmt = $conn->prepare("SELECT * FROM wishlist WHERE prodId = :prodId AND userId = :userId");
+                $stmt->bindParam(':prodId', $prodId, PDO::PARAM_INT);
+                $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
+                $stmt->execute();
 
-                if (mysqli_num_rows($chk_existing_wishlist_run) > 0) {
+                if (ob_get_length()) ob_clean();
+                if ($stmt->rowCount() > 0) {
                     echo "existing";
                 } else {
-                    $insert_query = "INSERT INTO wishlist (userId, prodId) VALUES ('$userId','$prodId')";
-                    $insert_query_run = mysqli_query($conn, $insert_query);
-
-                    if ($insert_query_run) {
-                        echo 200;
-                    } else {
-                        echo 500;
-                    }
+                    $insert = $conn->prepare("INSERT INTO wishlist (userId, prodId) VALUES (:userId, :prodId)");
+                    echo $insert->execute([':userId' => $userId, ':prodId' => $prodId]) ? "200" : "500";
                 }
+                exit; 
                 break;
-                case "delete":
-                if(isset($_POST['id'])) 
-                {
-                    $wishId = mysqli_real_escape_string($conn, $_POST['id']);
-                    $userId = $_SESSION['auth_user']['user_id'];
 
-                    $chk_existing_wishlist = "SELECT * FROM wishlist WHERE id='$wishId' AND userId='$userId'";
-                    $chk_existing_wishlist_run = mysqli_query($conn, $chk_existing_wishlist);
+            case "delete":
+                if (isset($_POST['id'])) {
 
-                    if (mysqli_num_rows($chk_existing_wishlist_run) > 0) {
-                        $delete_query = "DELETE FROM wishlist WHERE id='$wishId' AND userId='$userId'";
-                        $delete_query_run = mysqli_query($conn, $delete_query);
+                    $wishId = $_POST['id'];
 
-                        if ($delete_query_run) {
-                            echo 200;
-                        } else {
-                            echo "Greška u bazi podataka";
-                        }
+                    $stmt = $conn->prepare("SELECT * FROM wishlist WHERE id = :id AND userId = :userId");
+                    $stmt->bindParam(':id', $wishId, PDO::PARAM_INT);
+                    $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
+                    $stmt->execute();
+
+                    if ($stmt->rowCount() > 0) {
+
+                        $delete = $conn->prepare("DELETE FROM wishlist WHERE id = :id AND userId = :userId");
+                        $delete->bindParam(':id', $wishId, PDO::PARAM_INT);
+                        $delete->bindParam(':userId', $userId, PDO::PARAM_INT);
+
+                        $res = $delete->execute();
+                        if (ob_get_length()) ob_clean(); 
+                        echo $res ? "200" : "500";
                     } else {
-                        echo "Stavka nije pronađena ili Vam ne pripada";
+                        echo "Stavka nije pronađena";
                     }
+
                 } else {
                     echo "ID nije poslat";
                 }
+                exit;
                 break;
 
-        default:
-            echo 500;
+            default:
+                if (ob_get_length()) ob_clean();
+                echo "500";
+                exit;
+        }
     }
-}
 } else {
-echo 401;
+    echo 401;
 }
+?>

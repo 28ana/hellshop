@@ -31,8 +31,10 @@ include "functions/authcode.php";
                         <tbody>
                             <?php
                             $orders = getOrders();
-                            if (mysqli_num_rows($orders) > 0) {
-                                foreach ($orders as $item) {
+                            $orderList = $orders->fetchAll(PDO::FETCH_ASSOC);
+                            if (!empty($orderList)) {
+                                
+                                foreach ($orderList as $item) {
                             ?>
                                     <tr>
                                         <td><?= $item['id']; ?></td>

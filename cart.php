@@ -20,7 +20,7 @@ include "functions/authcode.php";
                 <?php
                 $items = getCartItems();
 
-                if (mysqli_num_rows($items) > 0) { 
+                if ($items && $items->rowCount() > 0) { 
                 ?>
                     <div class="row align-items-center d-none d-md-flex mb-2">
                         <div class="col-md-5"><h4 class="fw-bold">Proizvod</h4></div>
@@ -31,7 +31,8 @@ include "functions/authcode.php";
 
                     <?php
                     $totalPrice = 0;
-                    foreach ($items as $citem) {
+                    $cartItems = $items->fetchAll(PDO::FETCH_ASSOC);
+                    foreach ($cartItems as $citem) {
                         $subPrice = $citem['prodajnaCena'] * $citem['prodQty'];
                         $totalPrice += $subPrice;
                     ?>

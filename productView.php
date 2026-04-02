@@ -5,8 +5,7 @@ include "functions/myfunctions.php";
 
 if (isset($_GET['product'])) {
     $product_id = $_GET['product'];
-    $product_data = getByID("products", $product_id); 
-    $product = mysqli_fetch_array($product_data);
+    $product = getByID("products", $product_id); 
 
     if ($product) {
 ?>
@@ -20,7 +19,7 @@ if (isset($_GET['product'])) {
             </div>
         </div>
         <div class="bg-light py-4">
-            <div class="container col-md-12 product_data mt-3 d-flex">
+            <div class="container col-md-12 mt-3 d-flex">
                 <div class="row topview justify-content-center">
                     <div class="col-md-4">
                         <div class="shadow d-inline-block">
@@ -28,7 +27,7 @@ if (isset($_GET['product'])) {
                             style="max-height: 350px; width: 100%; object-fit: contain;">
                         </div>
                     </div>
-                     <div class="col-md-6 mt-4">
+                    <div class="col-md-6 mt-4">
                         <h2 class="fw-bold"><?= $product['ime'] ?></h2>
 
                         <p><?= $product['kratkiOpis'] ?></p>
@@ -43,35 +42,34 @@ if (isset($_GET['product'])) {
                                 <h2>Nova cena:<br><br><span class="text-success fw-bold"><?= $product['prodajnaCena'] ?></span>DIN 
                                 </h2>
                             </div>
-                           <div class="row product_data justify-content-center"> 
-                                <div class="col-md-4 mt-4">
-                                    <h2 class="fw-bold">Količina</h2>
-                                    <div class="input-group mb-3" style="width: 20vw; height:30px">
-                                        <button class="input-group-text decrement-btn fw-bold fs-4">-</button>
-                                        <input type="text" class="form-control fw-bold fs-4 text-center input-qty bg-white" value="1" disabled>
-                                        <button class="input-group-text increment-btn fw-bold fs-4">+</button>
+                            <div class="row product_data justify-content-center"> 
+                                    <div class="col-md-4 mt-4 text-center">
+                                        <h2 class="fw-bold">Količina</h2>
+                                        <div class="input-group mb-3 mx-auto" style="width: 200px; height:40px">
+                                            <button class="input-group-text decrement-btn fw-bold fs-4">-</button>
+                                            <input type="text" class="form-control fw-bold fs-4 text-center input-qty bg-white" value="1" disabled>
+                                            <button class="input-group-text increment-btn fw-bold fs-4">+</button>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="row mt-3 justify-content-center">
-                                <div class="col-md-6">
-                                    <button class="btn btn-primary px-4 addToCartBtn" value="<?= $product['id']; ?>">
-                                        <i class="fa fa-shoping-cart me-2"></i>
-                                        Ubaci u korpu
-                                    </button>
-                                </div>
-                                <div class="col-md-6">
-                                    <button class="btn btn-primary px-4 addToWishList" value="<?= $product['id'];?> ">
-                                        <i class="fa fa-heart me-2"></i>
-                                        Lista želja
-                                    </button>
-                                </div>
+
+                                    <div class="row mt-3 justify-content-center text-center">
+                                        <div class="col-md-6">
+                                            <button class="btn btn-primary px-4 addToCartBtn" value="<?= $product['id']; ?>">
+                                                <i class="fa fa-shopping-cart me-2"></i> Ubaci u korpu
+                                            </button>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <button class="btn btn-primary px-4 addToWishList" value="<?= $product['id'];?>">
+                                                <i class="fa fa-heart me-2"></i> Lista želja
+                                            </button>
+                                        </div>
+                                    </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div> 
+        </div>
         <div class="container">
             <div class=" col-md-12 bg-light 8">
                 <hr>

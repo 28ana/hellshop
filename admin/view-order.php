@@ -1,12 +1,13 @@
 <?php
 include "../middleware/adminMiddleWare.php";
+include_once "../functions/userfunctions.php";
 include "includes/header.php";
 
 if (isset($_GET['t'])) {
     $trackingNo = $_GET['t'];
     $orderData = adminCheckTrackingNoValid($trackingNo);
-
-    if (mysqli_num_rows($orderData) < 0) {
+    $data = $orderData->fetch(PDO::FETCH_ASSOC);
+    if (!$data) {
 ?>
         <h4>Nešto nije u redu.</h4>
     <?php
@@ -17,7 +18,6 @@ if (isset($_GET['t'])) {
 <?php
     die();
 }
-$data = mysqli_fetch_array($orderData);
 ?>
 
 <div class="py-2">
@@ -88,10 +88,11 @@ $data = mysqli_fetch_array($orderData);
                                         <tbody>
                                             <?php
                                             $order_query = "SELECT o.id as oid, o.trackingNo, o.userId, oi.*, oi.oiKolicina as ordersqty, p.* FROM orders o, order_items oi, products p 
-                                            WHERE oi.orderId=o.id AND p.id=oi.prodId AND o.trackingNo='$trackingNo' ";
-                                            $order_query_run = mysqli_query($conn, $order_query);
-                                            if (mysqli_num_rows($order_query_run) > 0) {
-                                                foreach ($order_query_run as $item) {
+                                            WHERE oi.orderId=o.id AND p.id=oi.prodId AND o.trackingNo=:trackingNo ";
+                                            $stmt_items=$conn->prepare($order_query);
+                                            $stmt_items->bindParam(":trackingNo", $trackingNo);
+                                            if ($item = $stmt_items->fetch(PDO::FETCH_ASSOC)) {
+                                                //foreach ($order_query_run as $item) {
                                             ?>
                                                     <tr>
                                                         <td class="align-middle">
@@ -105,7 +106,7 @@ $data = mysqli_fetch_array($orderData);
                                                         </td>
                                                     </tr>
                                             <?php
-                                                }
+                                                //}
                                             }
                                             ?>
                                         </tbody>

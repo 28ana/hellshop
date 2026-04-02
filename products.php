@@ -4,14 +4,10 @@ include "functions/myfunctions.php";
 include "functions/userfunctions.php";
 
 if (isset($_GET['categoryId'])) {
-
     $categoryId = $_GET['categoryId'];
-    
-    $category_data = getByID("categories", $categoryId);
-    $category = mysqli_fetch_array($category_data);
+    $category = getByID("categories", $categoryId);
  if ($category) {
 ?>
-
         <div class="py-3 bg-secondary">
             <div class="container">
                 <h6 class="text-white fs-4">
@@ -30,7 +26,7 @@ if (isset($_GET['categoryId'])) {
                             <hr>
                             <?php
                             $products = getProByCategory($categoryId);
-                            if (mysqli_num_rows($products) > 0) {
+                            if ($products->rowCount() > 0) {
                                 foreach ($products as $item) {
                             ?>
                             <div class="col-12 col-lg-3 col-md-6 mb-2 mt-5">

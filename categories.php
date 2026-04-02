@@ -19,7 +19,7 @@ include "includes/header.php";
                     <hr>
                     <?php
                     $categories = getAllActive("categories");
-                    if (mysqli_num_rows($categories) > 0) {
+                    if ($categories->rowCount() > 0) {
                         foreach ($categories as $item) {
                     ?>
                             <div class="col-md-3 mb-5 mt-5">

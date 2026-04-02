@@ -96,10 +96,10 @@ include "functions/userfunctions.php";
                     <tbody class="fs-4">
                         <?php
                         $query = "SELECT * FROM store";
-                        $result = mysqli_query($conn, $query);
+                        $stmt = $conn->query($query);
 
-                        if ($result && mysqli_num_rows($result) > 0) {
-                            while ($row = mysqli_fetch_assoc($result)) {
+                        if ($stmt->rowCount() > 0) {
+                            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                                 ?>
                                 <tr>
                                     <td><?= $row['grad']; ?></td>

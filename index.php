@@ -4,7 +4,6 @@ include "includes/slider.php";
 include "functions/userfunctions.php";
 ?>
 
-
 <div class="py-5">
     <div class="container">
         <div class="row">
@@ -15,8 +14,9 @@ include "functions/userfunctions.php";
                 <div class="owl-carousel owl-theme">
                     <?php
                     $categories = getAllActive("categories");
-                    if (mysqli_num_rows($categories) > 0) {
-                        foreach ($categories as $item) {
+                    $allCategories = $categories->fetchAll(PDO::FETCH_ASSOC);
+                    if(count($allCategories) > 0) {
+                    foreach($allCategories as $item) {
                     ?>
                         <div class="item">
                             <a class="text-decoration-none text-dark" href="products.php?categoryId=<?= $item['id']; ?>">
@@ -44,7 +44,7 @@ include "functions/userfunctions.php";
                 <div class="owl-carousel owl-theme">
                     <?php
                     $trendingProducts = getAllTrending();
-                    if (mysqli_num_rows($trendingProducts) > 0) {
+                    if ($trendingProducts->rowCount() > 0) {
                         foreach ($trendingProducts as $item) {
                     ?>
                         <div class="item">

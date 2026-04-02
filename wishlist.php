@@ -22,7 +22,9 @@ include "functions/authcode.php";
                         <?php
                         
                         $items = getWishItems();
-                        if (mysqli_num_rows($items) > 0) { ?>
+                        $wishList = $items ? $items->fetchAll(PDO::FETCH_ASSOC) : [];
+
+                        if (!empty($wishList)) { ?>
                             <div class="row align-items-center">
                                 <div class="col-md-2 text-center">
                                     <h4>Slika</h4>
@@ -39,7 +41,7 @@ include "functions/authcode.php";
                             </div>
                             <div id="">
                                 <?php
-                                foreach ($items as $witem) {
+                                foreach ($wishList as $witem) {
                                 ?>
                                     <div class="card product_data shadow-sm mb-3">
                                         <div class="row align-items-center">

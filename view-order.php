@@ -4,11 +4,10 @@ include "functions/userfunctions.php";
 
 if (isset($_GET['t'])) 
 {
-    $trackingNo = mysqli_real_escape_string($conn, $_GET['t']);
-    
+    $trackingNo = $_GET['t'];
     $orderData = checkTrackingNoValid($trackingNo);
 
-    if (mysqli_num_rows($orderData) == 0) 
+    if (!$orderData || $orderData->rowCount() == 0)
     {
         ?>
         <div class="container py-5"><h4>Narudžbina nije pronađena.</h4></div>
@@ -24,7 +23,7 @@ else
     die();
 }
 
-$data = mysqli_fetch_array($orderData);
+$data = $orderData->fetch(PDO::FETCH_ASSOC);
 ?>
 
 <div class="py-3 bg-secondary">
@@ -96,12 +95,15 @@ $data = mysqli_fetch_array($orderData);
                                 $orderId = $data['id'];
 
                                 $order_items_query = "SELECT oi.*, p.ime, p.image FROM order_items oi, products p 
-                                                      WHERE oi.orderId='$orderId' AND p.id=oi.prodId";
-                                $order_items_run = mysqli_query($conn, $order_items_query);
+                                                      WHERE oi.orderId=:orderId AND p.id=oi.prodId";
+                                $stmt = $conn->prepare($order_items_query);
+                                $stmt->bindParam(":orderId", $orderID, PDO::PARAM_INT);
+                                $stmt->execute();
 
-                                if (mysqli_num_rows($order_items_run) > 0) 
+                                $orderItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                if (!empty($orderItems))
                                 {
-                                    foreach ($order_items_run as $item) 
+                                    foreach ($orderItems as $item) 
                                     {
                                         ?>
                                         <tr>
