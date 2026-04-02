@@ -1,8 +1,8 @@
 <?php
 session_start();
-include "../config/dbcon.php";
-include "../functions/myfunctions.php";
-include "../functions/userfunctions.php";
+include __DIR__ . "/../config/dbcon.php";
+include_once __DIR__ . "/../functions/myfunctions.php";
+include_once __DIR__ . "/../functions/userfunctions.php";
 
 $path = "../uploads";
 
