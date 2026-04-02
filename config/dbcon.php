@@ -42,11 +42,11 @@
 //     die("Greška pri povezivanju: " . $e->getMessage());
 // } 
 
-var_dump(getenv('MYSQLDATABASE'));
-var_dump(getenv('MYSQL_DATABASE'));
+// var_dump(getenv('MYSQLDATABASE'));
+// var_dump(getenv('MYSQL_DATABASE'));
 $host = getenv('MYSQLHOST') ?: 'localhost';
 $port = getenv('MYSQLPORT') ?: '3306';
-$db   = getenv('MYSQLDATABASE');
+$db   = getenv('MYSQL_DATABASE');
 $user = getenv('MYSQLUSER');
 $pass = getenv('MYSQLPASSWORD');
 $charset = 'utf8mb4';
