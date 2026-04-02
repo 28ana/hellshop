@@ -1,5 +1,5 @@
 <?php
-include_once __DIR__ . "/middleware/adminMiddleWare.php";
+include_once __DIR__ . "../middleware/adminMiddleWare.php";
 include_once "includes/header.php";
 ?>
 <div class="container">
