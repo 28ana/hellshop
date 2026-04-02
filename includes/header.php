@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once("config\dbcon.php");
+require_once("config/dbcon.php");
 ?>
 <!doctype html>
 <html lang="en">
