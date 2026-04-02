@@ -1,6 +1,7 @@
 <?php
-include_once __DIR__ . "../middleware/adminMiddleWare.php";
-include_once __DIR__ . "../functions/userfunctions.php";
+include_once __DIR__ . "/../middleware/adminMiddleware.php";
+include_once __DIR__ . "/../functions/userfunctions.php";
+include_once __DIR__ . "/../functions/myfunctions.php";
 include_once "includes/header.php";
 ?>
 <div class="container">
