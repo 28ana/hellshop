@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once("config/dbcon.php");
+require_once(__DIR__ . "/config/dbcon.php");
 ?>
 <!doctype html>
 <html lang="en">
@@ -39,4 +39,4 @@ require_once("config/dbcon.php");
 </head>
 
 <body>
-    <?php include "navbar.php";?>
+<?php include __DIR__ . "/navbar.php"; ?>
