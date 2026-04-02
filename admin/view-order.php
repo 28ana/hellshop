@@ -1,6 +1,6 @@
 <?php
-include_once __DIR__ . "/../middleware/adminMiddleWare.php";
-include_once __DIR__ . "/../functions/userfunctions.php";
+include_once __DIR__ . "/middleware/adminMiddleWare.php";
+include_once __DIR__ . "/functions/userfunctions.php";
 include "includes/header.php";
 
 if (isset($_GET['t'])) {
