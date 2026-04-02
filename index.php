@@ -1,6 +1,5 @@
 <?php
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
+require 'vendor/autoload.php';
 include "includes/header.php";
 include "includes/slider.php";
 include "functions/userfunctions.php";
