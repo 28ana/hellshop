@@ -42,7 +42,8 @@
 //     die("Greška pri povezivanju: " . $e->getMessage());
 // } 
 
-// Railway automatski popunjava ove promenljive ako su definisane u "Variables" tabu
+var_dump(getenv('MYSQLDATABASE'));
+var_dump(getenv('MYSQL_DATABASE'));
 $host = getenv('MYSQLHOST') ?: 'localhost';
 $port = getenv('MYSQLPORT') ?: '3306';
 $db   = getenv('MYSQLDATABASE');

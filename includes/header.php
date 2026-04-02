@@ -39,4 +39,4 @@ require_once(__DIR__ . "/../config/dbcon.php");
 </head>
 
 <body>
-<?php include __DIR__ . "/navbar.php"; ?>
+<?php include "/navbar.php"; ?>
