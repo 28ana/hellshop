@@ -48,7 +48,12 @@
                 </p>
                 <a href="tel:+381645556664" class="text-white fs-4"><i class="fa fa-phone"></i> +381 645556664</a><br>
                 <a href="mailto:xyz@gmail.com" class="text-white fs-4"><i class="fa fa-envelope"></i> xyz@gmail.com</a>
+                <div>
+                    <h3><a href="dokumentacija.pdf" target="_blank" class="text-light">DOKUMENTACIJA</a></h3>
+                    <a href="hellshop.zip"  class="text-light">ZIP</a>
+                </div>
             </div>
+
             <div class="col-md-6">
                 <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2830.6710956565694!2d20.4571736!3d44.8078912!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x475a7aa979a545d5%3A0x60cf4ceb300aca4e!2z0J3QtdC80LDRmtC40L3QsCAxLCDQkdC10L7Qs9GA0LDQtA!5e0!3m2!1ssr!2srs!4v1674742824644!5m2!1ssr!2srs" class="w-100" height="200" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
             </div>
