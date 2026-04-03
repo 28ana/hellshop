@@ -1,6 +1,6 @@
 <?php
 session_start();
-include_once "userfunctions.php";
+include_once __DIR__ . "/userfunctions.php";
 
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     die("Nevalidan zahtev.");
@@ -36,25 +36,25 @@ if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_tok
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-require '../phpmailer/src/PHPMailer.php';
-require '../phpmailer/src/SMTP.php';
-require '../phpmailer/src/Exception.php';
+require __DIR__ . '/../phpmailer/src/PHPMailer.php';
+require __DIR__ . '/../phpmailer/src/SMTP.php';
+require __DIR__ . '/../phpmailer/src/Exception.php';
 
 $mail = new PHPMailer(true);
 
 try {
     $mail->isSMTP();
-    $mail->Host = 'smtp.gmail.com';
+    $mail->Host = getenv('MAIL_HOST');
     $mail->SMTPAuth = true;
 
     $mail->CharSet = 'UTF-8';
     $mail->Encoding = 'base64'; 
 
-    $mail->Username = 'markovicana316@gmail.com';
-    $mail->Password = 'klwh cfgz qznr zlrp';
+    $mail->Username = getenv('MAIL_USERNAME');
+    $mail->Password = getenv('MAIL_PASSWORD');
 
-    $mail->SMTPSecure = 'tls';
-    $mail->Port = 587;
+    $mail->SMTPSecure = getenv('MAIL_ENCRYPTION');
+    $mail->Port = getenv('MAIL_PORT');
 
     $mail->setFrom($email, $name);
 
