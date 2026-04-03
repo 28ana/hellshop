@@ -48,9 +48,9 @@
                 </p>
                 <a href="tel:+381645556664" class="text-white fs-4"><i class="fa fa-phone"></i> +381 645556664</a><br>
                 <a href="mailto:xyz@gmail.com" class="text-white fs-4"><i class="fa fa-envelope"></i> xyz@gmail.com</a>
-                <div>
-                    <h3><a href="dokumentacija.pdf" target="_blank" class="text-light">DOKUMENTACIJA</a></h3>
-                    <a href="hellshop.zip"  class="text-light">ZIP</a>
+                <div class="mt-3">
+                    <h3><a href="dokumentacija.pdf" target="_blank" class="text-light text-decoration-none">DOKUMENTACIJA</a></h3>
+                    <h3><a href="hellshop.zip" class="text-light text-decoration-none">ZIP</a></h3>
                 </div>
             </div>
 
