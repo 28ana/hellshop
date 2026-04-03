@@ -120,7 +120,7 @@ $(document).ready(function () {
 
         $.ajax({
             method: "POST",
-            url: "functions/handleWishlist.php",
+            url: "functions/handleWishList.php",
             data: {
                 "prodId": prod_id,
                 "scope2": "add"
