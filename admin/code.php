@@ -51,7 +51,7 @@ elseif (isset($_POST['update_category_btn'])) {
     $new_image = $_FILES['image']['name'];
     $old_image = $_POST['old_image'];
 
-    if ($new_image != "") {
+    if (isset($_FILES['image']) && $_FILES['image']['error'] === 0) {
         $image_ext = pathinfo($new_image, PATHINFO_EXTENSION);
         $update_filename = time() . '.' . $image_ext;
     } else {
@@ -63,10 +63,11 @@ elseif (isset($_POST['update_category_btn'])) {
     $stmt->bindParam(":status", $status);
     $stmt->bindParam(":opis", $description);
     $stmt->bindParam(":image", $update_filename);
-    $stmt->bindParam(":id", $id);
+    $stmt->bindParam(":id", $category_id);
 
     if ($stmt->execute()) {
         if ($new_image != "") {
+            $path = "../uploads";
             move_uploaded_file($_FILES['image']['tmp_name'], $path . '/' . $update_filename);
             if (file_exists("../uploads/" . $old_image)) {
                 unlink("../uploads/" . $old_image);

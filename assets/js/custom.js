@@ -145,7 +145,7 @@ $(document).ready(function () {
 
         $.ajax({
             method: "POST",
-            url: "functions/handleWishlist.php",
+            url: "functions/handleWishList.php",
             data: {
                 "id": id,
                 "scope2": "delete"
